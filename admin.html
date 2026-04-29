@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bibliothèque Ancienne — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=EB+Garamond:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1610; --bg2: #221c14; --bg3: #2a2218;
+    --border: #3a3020; --border2: #5c4a2e;
+    --gold: #c9a84c; --gold-dim: #a08030;
+    --text: #e8dcc8; --text2: #a89878; --text3: #6a5a40;
+    --green: #2d5a27; --green-text: #6a9a64;
+    --red: #5a2020; --red-text: #a06060;
+    --blue: #1a3a5a; --blue-text: #6a9aca;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'EB Garamond',serif; background:var(--bg); color:var(--text); min-height:100vh; }
+
+  .header { background:linear-gradient(180deg,#2a1f14,var(--bg)); padding:24px; text-align:center; border-bottom:3px solid var(--gold); }
+  .header h1 { font-family:'Cormorant Garamond',serif; font-size:1.6rem; color:var(--gold); letter-spacing:0.15em; }
+  .header p { color:var(--text2); font-size:0.9rem; font-style:italic; margin-top:4px; }
+
+  .info-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:10px 20px; background:var(--bg2); border-bottom:1px solid var(--border); }
+  .info-bar span { font-size:0.85rem; color:var(--text2); }
+  .info-bar small { color:var(--text3); font-size:0.72rem; width:100%; }
+
+  .toolbar { display:flex; flex-wrap:wrap; gap:8px; padding:12px 20px; background:var(--bg2); border-bottom:2px solid var(--border); }
+  .btn {
+    font-family:'Cormorant Garamond',serif; font-size:0.9rem; font-weight:600;
+    padding:8px 18px; border-radius:4px; cursor:pointer; border:1px solid var(--border); transition:all 0.2s;
+  }
+  .btn-default { background:transparent; color:var(--text2); }
+  .btn-default:hover { background:var(--bg3); color:var(--gold); }
+  .btn-default.active { background:var(--bg3); color:var(--gold); border-color:var(--gold); }
+  .btn-primary { background:linear-gradient(135deg,#5c3a1e,#7a5230); color:var(--gold); border-color:var(--gold); }
+  .btn-export { background:#1a3a1a; color:var(--green-text); border-color:var(--green); margin-left:auto; }
+  .btn-save { background:linear-gradient(135deg,var(--green),#3a7a30); color:#c0e8b8; border-color:#4a9a40; }
+  .btn-translate { background:linear-gradient(135deg,var(--blue),#2a5a8a); color:#c0d8f0; border-color:#4a8aca; }
+  .btn-danger { border-color:var(--red); color:var(--red-text); background:var(--bg3); }
+  .btn-sm { padding:4px 10px; font-size:0.8rem; }
+  .btn-gt { padding:3px 8px; font-size:0.75rem; background:var(--bg3); color:var(--text2); border-color:var(--border); }
+  .btn:disabled { opacity:0.5; cursor:not-allowed; }
+
+  .content { max-width:1200px; margin:0 auto; padding:20px; }
+
+  /* Empty */
+  .empty { text-align:center; padding:60px 20px; }
+  .empty .icon { font-size:4rem; opacity:0.3; margin-bottom:16px; }
+  .empty h2 { color:var(--gold); font-size:1.3rem; margin-bottom:12px; }
+  .empty p { color:var(--text3); line-height:1.8; max-width:500px; margin:0 auto 20px; }
+  .workflow { display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap; }
+  .step { display:flex; align-items:center; gap:6px; padding:6px 12px; background:var(--bg3); border:1px solid var(--border); border-radius:4px; font-size:0.8rem; color:var(--text2); }
+  .step-num { width:20px; height:20px; display:flex; align-items:center; justify-content:center; background:var(--gold); color:var(--bg); border-radius:50%; font-size:0.7rem; font-weight:700; }
+  .arrow { color:var(--border2); }
+
+  /* Book list */
+  .book-row { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg2); border:1px solid var(--border); border-radius:6px; margin-bottom:8px; }
+  .book-color { width:12px; height:44px; border-radius:3px; flex-shrink:0; }
+  .book-meta { flex:1; }
+  .book-meta strong { color:var(--gold); font-size:1rem; display:block; }
+  .book-meta span { color:var(--text3); font-size:0.8rem; }
+  .badge { display:inline-block; padding:3px 8px; border-radius:10px; font-size:0.72rem; color:var(--text); }
+
+  /* Edit */
+  .edit-grid { display:grid; grid-template-columns:340px 1fr; gap:20px; align-items:start; }
+  .panel { padding:20px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; }
+  .panel-title { color:var(--gold); font-size:1rem; margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+  .label { display:block; color:var(--text3); font-size:0.78rem; margin:10px 0 3px; text-transform:uppercase; letter-spacing:0.08em; }
+  .input, .select, .textarea {
+    width:100%; padding:7px 10px; background:var(--bg); border:1px solid var(--border); border-radius:4px;
+    color:var(--text); font-family:inherit; font-size:0.9rem;
+  }
+  .textarea { resize:vertical; line-height:1.6; }
+  .textarea-trans { background:#0e1008; border-color:#1a2a18; color:#a8c8a0; }
+  .row { display:flex; gap:12px; }
+  .col { flex:1; }
+
+  .colors { display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
+  .color-btn { width:28px; height:28px; border-radius:3px; border:2px solid transparent; cursor:pointer; }
+  .color-btn.active { outline:2px solid var(--gold); outline-offset:1px; }
+
+  .cover-preview { margin-top:14px; padding:24px 16px; border-radius:6px; text-align:center; position:relative; min-height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .cover-preview::before { content:''; position:absolute; inset:6px; border:1px solid rgba(201,168,76,0.3); border-radius:3px; pointer-events:none; }
+  .cover-preview .ct { color:var(--gold); font-size:1rem; font-weight:700; }
+  .cover-preview .ca { color:#d0c4a8; font-size:0.8rem; font-style:italic; margin-top:4px; }
+
+  .lang-checks { display:flex; flex-direction:column; gap:5px; margin-top:4px; }
+  .lang-checks label { display:flex; align-items:center; gap:6px; color:var(--text2); font-size:0.85rem; cursor:pointer; }
+
+  .divider { text-align:center; margin:14px 0; border-bottom:1px solid var(--border); line-height:0.1em; }
+  .divider span { background:var(--bg2); padding:0 10px; color:var(--text3); font-size:0.8rem; }
+
+  .pages-panel { max-height:calc(100vh - 200px); overflow-y:auto; }
+  .page-card { padding:14px; background:var(--bg); border:1px solid var(--bg3); border-radius:6px; margin-bottom:12px; }
+  .page-card-header { display:flex; justify-content:space-between; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--bg3); }
+  .page-num { color:var(--gold); font-weight:600; font-size:0.9rem; }
+  .char-count { color:var(--text3); font-size:0.72rem; }
+  .gt-row { display:flex; align-items:center; gap:5px; margin:6px 0; flex-wrap:wrap; }
+  .gt-label { font-size:0.72rem; color:var(--text3); }
+
+  /* Processing */
+  .proc-card { max-width:700px; margin:0 auto; padding:28px; background:var(--bg2); border:1px solid var(--border); border-radius:8px; }
+  .proc-card h2 { color:var(--gold); font-size:1.1rem; margin-bottom:10px; }
+  .proc-status { color:var(--text2); font-style:italic; margin-bottom:14px; }
+  .progress { height:8px; background:var(--bg); border-radius:4px; overflow:hidden; margin-bottom:6px; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--gold-dim),var(--gold)); border-radius:4px; transition:width 0.3s; }
+  .log { margin-top:16px; max-height:300px; overflow-y:auto; padding:12px; background:#0e0c08; border-radius:6px; border:1px solid var(--bg3); font-family:'Courier New',monospace; font-size:0.76rem; line-height:1.7; color:#8a9a78; }
+
+  .footer { text-align:center; padding:16px; border-top:2px solid var(--border); color:var(--text3); font-size:0.8rem; }
+
+  @media(max-width:900px) { .edit-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⚜ BIBLIOTHÈQUE ANCIENNE — YÖNETİM ⚜</h1>
+  <p>PDF → OCR → Çeviri → JSON Dışa Aktarma</p>
+</div>
+
+<div class="info-bar">
+  <span>✅ Tamamen Ücretsiz:</span>
+  <span>OCR (Tesseract.js) · Çeviri (MyMemory API + Google Translate) · Seslendirme (Web Speech API)</span>
+  <small>Admin paneli bilgisayarınızda açın, kitapları hazırlayın, JSON'u GitHub'a yükleyin.</small>
+</div>
+
+<div class="toolbar" id="toolbar">
+  <button class="btn btn-default active" onclick="showView('list')">📚 Kitaplar (<span id="bookCount">0</span>)</button>
+  <button class="btn btn-primary" id="uploadBtn" disabled onclick="document.getElementById('pdfInput').click()">
+    ⏳ Yükleniyor...
+  </button>
+  <input type="file" id="pdfInput" accept=".pdf" style="display:none" onchange="handlePDF(event)">
+  <button class="btn btn-default" onclick="importJSON()">📂 JSON İçe Aktar</button>
+  <input type="file" id="jsonInput" accept=".json" style="display:none" onchange="handleJSONImport(event)">
+  <button class="btn btn-export" onclick="exportAllJSON()">📦 books.json Dışa Aktar</button>
+</div>
+
+<div class="content" id="content"></div>
+
+<div class="footer">
+  ⚜ Dışa aktarılan <strong>books.json</strong> dosyasını GitHub reposundaki <strong>data/</strong> klasörüne yükleyin → Site otomatik güncellenir ⚜
+</div>
+
+<!-- External libs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let books = [];
+let activeBook = null;
+let currentView = 'list';
+let selectedLangs = ['tr','en'];
+let processingLog = [];
+
+const LANGS = [
+  {code:'tr',name:'Türkçe',flag:'🇹🇷'},
+  {code:'en',name:'English',flag:'🇬🇧'},
+  {code:'de',name:'Deutsch',flag:'🇩🇪'},
+  {code:'ar',name:'العربية',flag:'🇸🇦'}
+];
+const COLORS = ['#5c3a1e','#2d5a27','#1a1a3a','#3a1a1a','#5a1a3a','#1a3a5a','#4a3a1a','#2a2a2a'];
+const GENRES = ['Felsefe','Edebiyat','Roman','Şiir','Tarih','İlahiyat','Siyaset Felsefesi','Hiciv','Fabl','Bilim','Tiyatro','Deneme'];
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  // Load from localStorage
+  try {
+    const saved = localStorage.getItem('bibliotheque-books');
+    if (saved) books = JSON.parse(saved);
+  } catch(e) {}
+
+  // Setup PDF.js
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+
+  // Check libs loaded
+  const checkLibs = setInterval(() => {
+    if (window.pdfjsLib && window.Tesseract) {
+      clearInterval(checkLibs);
+      const btn = document.getElementById('uploadBtn');
+      btn.textContent = '➕ Yeni PDF Yükle';
+      btn.disabled = false;
+    }
+  }, 500);
+
+  render();
+});
+
+function save() {
+  localStorage.setItem('bibliotheque-books', JSON.stringify(books));
+  document.getElementById('bookCount').textContent = books.length;
+}
+
+// ═══════════════════════════════════════════
+// VIEWS
+// ═══════════════════════════════════════════
+function showView(v) { currentView = v; render(); }
+
+function render() {
+  document.getElementById('bookCount').textContent = books.length;
+  const c = document.getElementById('content');
+  if (currentView === 'list') c.innerHTML = renderList();
+  else if (currentView === 'edit') c.innerHTML = renderEdit();
+  else if (currentView === 'processing') c.innerHTML = renderProcessing();
+}
+
+function renderList() {
+  if (books.length === 0) return `
+    <div class="empty">
+      <div class="icon">📜</div>
+      <h2>Henüz kitap eklenmedi</h2>
+      <p>"Yeni PDF Yükle" ile başlayın veya "JSON İçe Aktar" ile mevcut kitapları yükleyin.</p>
+      <div class="workflow">
+        <div class="step"><span class="step-num">1</span>PDF Yükle</div>
+        <span class="arrow">→</span>
+        <div class="step"><span class="step-num">2</span>OCR Tara</div>
+        <span class="arrow">→</span>
+        <div class="step"><span class="step-num">3</span>Düzenle</div>
+        <span class="arrow">→</span>
+        <div class="step"><span class="step-num">4</span>Çevir</div>
+        <span class="arrow">→</span>
+        <div class="step"><span class="step-num">5</span>JSON Aktar</div>
+        <span class="arrow">→</span>
+        <div class="step"><span class="step-num">6</span>GitHub'a Yükle</div>
+      </div>
+    </div>`;
+
+  return books.map((b,i) => `
+    <div class="book-row">
+      <div class="book-color" style="background:${b.coverColor||'#5c3a1e'}"></div>
+      <div class="book-meta">
+        <strong>${b.title||'İsimsiz'}</strong>
+        <span>${b.author||'?'} · ${b.year||'?'} · ${b.pages?.length||0} sayfa · Çeviri: ${
+          Object.keys(b.translations||{}).length > 0
+            ? Object.keys(b.translations).map(l=>LANGS.find(la=>la.code===l)?.flag||l).join(' ')
+            : 'Yok'
+        }</span>
+      </div>
+      <span class="badge" style="background:${b.status==='translated'?'#2d5a27':b.status==='ocr_done'?'#8b6914':'#5c3a1e'}">
+        ${b.status==='translated'?'✅ Hazır':b.status==='ocr_done'?'⏳ Çeviri bekliyor':'📄 Taslak'}
+      </span>
+      <button class="btn btn-sm btn-default" onclick="editBook(${i})">✏️ Düzenle</button>
+      <button class="btn btn-sm btn-default" onclick="exportBook(${i})">📥 JSON</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteBook(${i})">🗑️</button>
+    </div>`).join('');
+}
+
+function renderEdit() {
+  if (!activeBook) return '';
+  const b = activeBook;
+  return `
+  <div class="edit-grid">
+    <div class="panel">
+      <h3 class="panel-title">📖 Kitap Bilgileri</h3>
+      <label class="label">Başlık</label>
+      <input class="input" value="${esc(b.title)}" onchange="activeBook.title=this.value">
+      <label class="label">Yazar</label>
+      <input class="input" value="${esc(b.author||'')}" onchange="activeBook.author=this.value">
+      <div class="row">
+        <div class="col">
+          <label class="label">Yıl</label>
+          <input class="input" value="${esc(String(b.year||''))}" onchange="activeBook.year=this.value">
+        </div>
+        <div class="col">
+          <label class="label">Tür</label>
+          <select class="select" onchange="activeBook.genre=this.value">
+            ${GENRES.map(g=>`<option ${b.genre===g?'selected':''}>${g}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <label class="label">Kapak Rengi</label>
+      <div class="colors">
+        ${COLORS.map(c=>`<button class="color-btn ${b.coverColor===c?'active':''}" style="background:${c}" onclick="activeBook.coverColor='${c}';render()"></button>`).join('')}
+      </div>
+      <div class="cover-preview" style="background:linear-gradient(135deg,${b.coverColor||'#5c3a1e'},${b.coverColor||'#5c3a1e'}dd)">
+        <div class="ct">${b.title||'Başlık'}</div>
+        <div class="ca">${b.author||'Yazar'}</div>
+      </div>
+
+      <h3 class="panel-title" style="margin-top:20px">🌐 Çeviri</h3>
+      <label class="label">Hedef Diller</label>
+      <div class="lang-checks">
+        ${LANGS.map(l=>`<label><input type="checkbox" ${selectedLangs.includes(l.code)?'checked':''} onchange="toggleLang('${l.code}',this.checked)"> ${l.flag} ${l.name}</label>`).join('')}
+      </div>
+      <button class="btn btn-translate" style="width:100%;margin-top:12px" onclick="translateFree()">
+        🔄 Otomatik Çevir (MyMemory — Ücretsiz)
+      </button>
+      <small style="color:var(--green-text);display:block;margin-top:4px">Günde ~5000 kelime · API anahtarı gerekmez</small>
+
+      <div class="divider"><span>veya</span></div>
+      <p style="color:var(--text2);font-size:0.82rem">Her sayfanın yanındaki 🌍 butonları ile Google Translate'te açıp, çeviriyi yapıştırın.</p>
+
+      <div style="display:flex;gap:8px;margin-top:18px">
+        <button class="btn btn-save" style="flex:1" onclick="saveBook()">💾 Kaydet</button>
+        <button class="btn btn-default" onclick="activeBook=null;showView('list')">İptal</button>
+      </div>
+    </div>
+
+    <div class="panel pages-panel">
+      <h3 class="panel-title">📄 Sayfalar (${b.pages?.length||0})</h3>
+      ${(b.pages||[]).map((p,i)=>`
+        <div class="page-card">
+          <div class="page-card-header">
+            <span class="page-num">Sayfa ${p.pageNum||i+1}</span>
+            <span class="char-count">${(p.fr||'').length} karakter</span>
+          </div>
+          <label class="label">Orijinal Fransızca:</label>
+          <textarea class="textarea" rows="4" onchange="activeBook.pages[${i}].fr=this.value">${esc(p.fr||'')}</textarea>
+          <div class="gt-row">
+            <span class="gt-label">🌍 Google Translate:</span>
+            ${LANGS.map(l=>`<button class="btn btn-gt" onclick="openGT(${i},'${l.code}')">${l.flag} ${l.code.toUpperCase()}</button>`).join('')}
+          </div>
+          ${selectedLangs.map(lang=>{
+            const li = LANGS.find(l=>l.code===lang);
+            const t = (b.translations&&b.translations[lang])?b.translations[lang][i]||'':'';
+            return `
+              <label class="label">${li?.flag||''} ${li?.name||lang}:</label>
+              <textarea class="textarea textarea-trans" rows="3"
+                placeholder="Çeviriyi buraya yapıştırın..."
+                onchange="ensureTrans('${lang}');activeBook.translations['${lang}'][${i}]=this.value">${esc(t)}</textarea>`;
+          }).join('')}
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderProcessing() {
+  return `
+    <div class="proc-card">
+      <h2 id="procTitle">⚙️ İşleniyor</h2>
+      <p class="proc-status" id="procStatus"></p>
+      <div class="progress"><div class="progress-fill" id="procProgress" style="width:0%"></div></div>
+      <span style="font-size:0.85rem;color:var(--gold)" id="procPercent">0%</span>
+      <div class="log" id="procLog"></div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function ensureTrans(lang) {
+  if (!activeBook.translations) activeBook.translations = {};
+  if (!activeBook.translations[lang]) activeBook.translations[lang] = [];
+}
+
+function toggleLang(code, checked) {
+  if (checked && !selectedLangs.includes(code)) selectedLangs.push(code);
+  else selectedLangs = selectedLangs.filter(l=>l!==code);
+  if (currentView==='edit') render();
+}
+
+function openGT(pageIdx, lang) {
+  const text = activeBook.pages[pageIdx]?.fr || '';
+  const encoded = encodeURIComponent(text.substring(0,4900));
+  window.open(`https://translate.google.com/?sl=fr&tl=${lang}&text=${encoded}&op=translate`,'_blank');
+}
+
+function editBook(idx) { activeBook = JSON.parse(JSON.stringify(books[idx])); showView('edit'); }
+
+function saveBook() {
+  if (!activeBook) return;
+  const idx = books.findIndex(b=>b.id===activeBook.id);
+  if (idx>=0) books[idx] = activeBook; else books.push(activeBook);
+  save(); activeBook = null; showView('list');
+}
+
+function deleteBook(idx) {
+  if (!confirm('Bu kitabı silmek istediğinize emin misiniz?')) return;
+  books.splice(idx,1); save(); render();
+}
+
+function importJSON() { document.getElementById('jsonInput').click(); }
+function handleJSONImport(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      const arr = Array.isArray(data) ? data : [data];
+      const existIds = new Set(books.map(b=>b.id));
+      let added = 0;
+      arr.forEach(b => { if(!existIds.has(b.id)){ books.push(b); added++; } });
+      save(); render();
+      alert(`✅ ${added} kitap eklendi`);
+    } catch(err) { alert('❌ Geçersiz JSON: '+err.message); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ═══════════════════════════════════════════
+// EXPORT — Ana sitenin okuduğu books.json
+// ═══════════════════════════════════════════
+function exportAllJSON() {
+  if (books.length===0) { alert('Dışa aktarılacak kitap yok!'); return; }
+  // thumbnails ve status alanlarını çıkar
+  const clean = books.map(({thumbnails, status, ...rest}) => rest);
+  download(JSON.stringify(clean, null, 2), 'books.json');
+}
+
+function exportBook(idx) {
+  const {thumbnails, status, ...b} = books[idx];
+  download(JSON.stringify(b, null, 2), `${(b.title||'kitap').replace(/\s+/g,'-').toLowerCase()}.json`);
+}
+
+function download(text, filename) {
+  const blob = new Blob([text], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ═══════════════════════════════════════════
+// PDF → OCR
+// ═══════════════════════════════════════════
+async function handlePDF(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  showView('processing');
+  setTimeout(async () => {
+    const log = s => {
+      processingLog.push(`[${new Date().toLocaleTimeString('tr-TR')}] ${s}`);
+      const el = document.getElementById('procLog');
+      if (el) { el.innerHTML = processingLog.join('<br>'); el.scrollTop = el.scrollHeight; }
+    };
+    const setStatus = s => { const el=document.getElementById('procStatus'); if(el) el.textContent=s; };
+    const setProg = p => {
+      const el=document.getElementById('procProgress'); if(el) el.style.width=p+'%';
+      const el2=document.getElementById('procPercent'); if(el2) el2.textContent=p+'%';
+    };
+
+    processingLog = [];
+    log(`📄 PDF: ${file.name} (${(file.size/1024/1024).toFixed(2)} MB)`);
+    setStatus('PDF yükleniyor...'); setProg(5);
+
+    try {
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({data:buf}).promise;
+      const total = pdf.numPages;
+      log(`📖 ${total} sayfa tespit edildi`);
+
+      setStatus('OCR motoru hazırlanıyor...');
+      log('⚙️ Tesseract OCR başlatılıyor (Fransızca)...');
+      const worker = await Tesseract.createWorker('fra', 1, {
+        logger: m => { if(m.status==='recognizing text') setProg(10+Math.floor(m.progress*60)); }
+      });
+      log('✅ OCR motoru hazır');
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const pages = [];
+
+      for (let i=1; i<=total; i++) {
+        setStatus(`Sayfa ${i}/${total} taranıyor...`);
+        log(`🔍 Sayfa ${i} render ediliyor...`);
+
+        const page = await pdf.getPage(i);
+        const vp = page.getViewport({scale:2.0});
+        canvas.width = vp.width; canvas.height = vp.height;
+        await page.render({canvasContext:ctx, viewport:vp}).promise;
+
+        log(`🔤 Sayfa ${i} OCR okunuyor...`);
+        const {data} = await worker.recognize(canvas.toDataURL('image/png'));
+
+        pages.push({ pageNum: String(i), fr: data.text.trim() });
+        log(`✅ Sayfa ${i} tamam (${data.text.length} karakter)`);
+        setProg(10 + Math.floor((i/total)*70));
+      }
+
+      await worker.terminate();
+
+      activeBook = {
+        id: Date.now(), title: file.name.replace('.pdf',''),
+        author: '', year: '', genre: GENRES[0], coverColor: COLORS[0],
+        pageCount: total, pages, translations: {}, status: 'ocr_done'
+      };
+
+      log('🎉 OCR tamamlandı!');
+      setStatus('Tamamlandı! Düzenleme sayfasına yönlendiriliyor...');
+      setProg(100);
+      setTimeout(() => showView('edit'), 1000);
+    } catch(err) {
+      log(`❌ Hata: ${err.message}`);
+      setStatus('Hata: ' + err.message);
+    }
+  }, 100);
+  e.target.value = '';
+}
+
+// ═══════════════════════════════════════════
+// ÜCRETSİZ ÇEVİRİ — MyMemory API
+// ═══════════════════════════════════════════
+async function translateFree() {
+  if (!activeBook?.pages?.length) return;
+  // Save current edits from DOM
+  syncEditsFromDOM();
+
+  showView('processing');
+  setTimeout(async () => {
+    processingLog = [];
+    const log = s => {
+      processingLog.push(`[${new Date().toLocaleTimeString('tr-TR')}] ${s}`);
+      const el=document.getElementById('procLog'); if(el){el.innerHTML=processingLog.join('<br>');el.scrollTop=el.scrollHeight;}
+    };
+    const setStatus = s => { const el=document.getElementById('procStatus'); if(el) el.textContent=s; };
+    const setProg = p => {
+      const el=document.getElementById('procProgress'); if(el) el.style.width=p+'%';
+      const el2=document.getElementById('procPercent'); if(el2) el2.textContent=p+'%';
+    };
+
+    log('🌐 Ücretsiz çeviri başlıyor (MyMemory API)...');
+    const trans = activeBook.translations || {};
+    const totalOps = selectedLangs.length * activeBook.pages.length;
+    let done = 0, limitHit = false;
+
+    for (const lang of selectedLangs) {
+      if (limitHit) break;
+      const ln = LANGS.find(l=>l.code===lang)?.name||lang;
+      if(!trans[lang]) trans[lang] = [];
+      log(`\n🔄 ${ln} çevirisi...`);
+
+      for (let i=0; i<activeBook.pages.length; i++) {
+        if (limitHit) break;
+        const text = activeBook.pages[i].fr;
+        if (!text||text.trim().length<5) { trans[lang][i]='(Boş)'; done++; continue; }
+
+        setStatus(`${ln}: Sayfa ${i+1}/${activeBook.pages.length}`);
+        log(`  📄 Sayfa ${i+1} → ${ln}...`);
+
+        try {
+          const chunks = splitText(text, 450);
+          let full = '';
+          for (const chunk of chunks) {
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunk)}&langpair=fr|${lang}`;
+            const resp = await fetch(url);
+            const d = await resp.json();
+            if (d.responseStatus===429) { log('  ⚠️ Günlük limit aşıldı!'); limitHit=true; break; }
+            if (d.responseData?.translatedText) full += d.responseData.translatedText+'\n';
+            else full += chunk+'\n';
+            await new Promise(r=>setTimeout(r,1100));
+          }
+          if(!limitHit) { trans[lang][i]=full.trim(); log(`  ✅ Sayfa ${i+1} tamam`); }
+        } catch(err) { trans[lang][i]='(Hata)'; log(`  ❌ ${err.message}`); }
+        done++;
+        setProg(Math.floor((done/totalOps)*100));
+      }
+      if(!limitHit) log(`✅ ${ln} tamamlandı`);
+    }
+
+    activeBook.translations = trans;
+    activeBook.status = limitHit ? 'partial' : 'translated';
+    log(limitHit ? '\n⚠️ Kısmen tamamlandı' : '\n🎉 Tüm çeviriler tamam!');
+    setStatus(limitHit ? 'Kısmen tamamlandı' : 'Tamamlandı!');
+    setProg(100);
+    setTimeout(() => showView('edit'), 1500);
+  }, 100);
+}
+
+function splitText(text, max) {
+  if (text.length<=max) return [text];
+  const chunks=[]; let rem=text;
+  while(rem.length>0) {
+    if(rem.length<=max){chunks.push(rem);break;}
+    let sp=rem.lastIndexOf('. ',max);
+    if(sp<max*0.3) sp=rem.lastIndexOf(' ',max);
+    if(sp<0) sp=max;
+    chunks.push(rem.substring(0,sp+1));
+    rem=rem.substring(sp+1).trim();
+  }
+  return chunks;
+}
+
+function syncEditsFromDOM() {
+  // Collect textarea values from the edit view before switching
+  if (currentView!=='edit'||!activeBook) return;
+  document.querySelectorAll('.page-card').forEach((card, i) => {
+    const textareas = card.querySelectorAll('textarea');
+    if(textareas[0]) activeBook.pages[i].fr = textareas[0].value;
+    let tIdx = 1;
+    selectedLangs.forEach(lang => {
+      ensureTrans(lang);
+      if(textareas[tIdx]) activeBook.translations[lang][i] = textareas[tIdx].value;
+      tIdx++;
+    });
+  });
+}
+</script>
+</body>
+</html>

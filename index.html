@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bibliothèque Ancienne — Eski Fransızca Eserler</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --parchment: #f5f0e1;
+    --parchment-dark: #e8dcc8;
+    --leather: #5c3a1e;
+    --leather-light: #7a5230;
+    --gold: #c9a84c;
+    --gold-light: #dfc06a;
+    --gold-dim: #a08030;
+    --ink: #2a1f14;
+    --ink-light: #4a3828;
+    --cream: #faf6eb;
+    --shadow: rgba(42, 31, 20, 0.3);
+    --page-shadow: rgba(42, 31, 20, 0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'EB Garamond', serif;
+    background: var(--parchment);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    background: linear-gradient(180deg, var(--leather) 0%, #4a2e15 100%);
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+    border-bottom: 4px solid var(--gold);
+    box-shadow: 0 4px 20px var(--shadow);
+  }
+  .header-ornament { color: var(--gold); font-size: 1.6rem; letter-spacing: 1rem; margin-bottom: 0.5rem; opacity: 0.7; }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: var(--gold);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 0.15em;
+  }
+  header p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.15rem;
+    color: var(--parchment-dark);
+    font-style: italic;
+    letter-spacing: 0.08em;
+    margin-top: 0.3rem;
+  }
+
+  /* ─── NAV ─── */
+  .nav-bar {
+    display: flex; justify-content: center; gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: var(--ink);
+    border-bottom: 2px solid var(--gold-dim);
+  }
+  .nav-btn {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem; font-weight: 600;
+    padding: 0.5rem 1.5rem;
+    background: transparent; color: var(--parchment-dark);
+    border: 1px solid transparent;
+    cursor: pointer; letter-spacing: 0.05em;
+    transition: all 0.3s; border-radius: 2px;
+  }
+  .nav-btn:hover, .nav-btn.active {
+    color: var(--gold); border-color: var(--gold-dim);
+    background: rgba(201,168,76,0.08);
+  }
+
+  /* ─── LIBRARY ─── */
+  .library-container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; color: var(--leather);
+    text-align: center; margin: 1.5rem 0 2rem;
+  }
+  .section-title::before, .section-title::after {
+    content: '─── ✦ ───'; color: var(--gold-dim); font-size: 0.9rem; display: block; opacity: 0.6;
+  }
+
+  .bookshelf {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 2rem; margin-bottom: 3rem;
+  }
+  .book-card {
+    background: var(--cream);
+    border: 1px solid var(--parchment-dark);
+    border-radius: 4px; overflow: hidden;
+    cursor: pointer; transition: all 0.4s ease;
+    box-shadow: 0 2px 8px var(--page-shadow);
+    animation: fadeIn 0.5s ease both;
+  }
+  .book-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px var(--shadow);
+    border-color: var(--gold);
+  }
+  .book-cover {
+    height: 280px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 1.5rem; position: relative; overflow: hidden;
+  }
+  .book-cover::before {
+    content: ''; position: absolute; inset: 8px;
+    border: 1px solid var(--gold-dim); border-radius: 2px; opacity: 0.4;
+  }
+  .book-cover::after {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 20px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.3), transparent);
+  }
+  .book-cover .cover-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.3; }
+  .book-cover h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; color: var(--gold);
+    text-align: center; line-height: 1.4;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .book-cover .author {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.9rem; color: var(--parchment-dark);
+    margin-top: 0.5rem; font-style: italic;
+  }
+  .book-cover .year-badge {
+    position: absolute; bottom: 12px; right: 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.8rem; color: var(--gold-dim); opacity: 0.7;
+  }
+  .book-info {
+    padding: 1rem; border-top: 2px solid var(--gold);
+  }
+  .book-info .genre { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--leather-light); }
+  .book-info .pages { font-size: 0.85rem; color: var(--ink-light); margin-top: 0.3rem; }
+
+  /* ─── LOADING ─── */
+  .loading-msg {
+    text-align: center; padding: 4rem 2rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem; color: var(--leather-light);
+    font-style: italic;
+  }
+  .loading-msg .spinner {
+    display: inline-block; width: 20px; height: 20px;
+    border: 2px solid var(--gold-dim); border-top-color: var(--gold);
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+    margin-right: 8px; vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    text-align: center; padding: 4rem 2rem;
+  }
+  .empty-state .icon { font-size: 4rem; opacity: 0.3; margin-bottom: 1rem; }
+  .empty-state h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--leather); font-size: 1.3rem; margin-bottom: 0.5rem;
+  }
+  .empty-state p { color: var(--ink-light); font-size: 1rem; }
+
+  /* ─── READER ─── */
+  .reader-container { display: none; max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+  .reader-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid var(--gold);
+  }
+  .back-btn {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem; font-weight: 600;
+    padding: 0.5rem 1.2rem;
+    background: var(--leather); color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    cursor: pointer; border-radius: 3px; transition: all 0.3s;
+  }
+  .back-btn:hover { background: var(--leather-light); }
+  .reader-book-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--leather); }
+  .reader-controls { display: flex; gap: 0.5rem; }
+
+  .page-area { display: flex; gap: 1.5rem; min-height: 70vh; }
+  .page-panel {
+    flex: 1; background: var(--cream);
+    border: 1px solid var(--parchment-dark); border-radius: 4px;
+    box-shadow: 2px 2px 12px var(--page-shadow);
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.7rem 1rem;
+    background: linear-gradient(180deg, var(--leather), #4a2e15);
+    border-bottom: 2px solid var(--gold);
+  }
+  .panel-header span {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.9rem; color: var(--gold); font-weight: 600;
+  }
+  .panel-actions { display: flex; gap: 0.4rem; }
+  .icon-btn {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(201,168,76,0.1); border: 1px solid var(--gold-dim);
+    color: var(--gold); cursor: pointer; border-radius: 3px;
+    font-size: 0.9rem; transition: all 0.3s;
+  }
+  .icon-btn:hover { background: rgba(201,168,76,0.25); }
+  .icon-btn.active { background: var(--gold); color: var(--leather); }
+
+  .page-content {
+    flex: 1; padding: 2rem; overflow-y: auto;
+    font-family: 'EB Garamond', serif;
+    font-size: 1.1rem; line-height: 1.8;
+  }
+  .scan-page {
+    background: var(--parchment); border: 1px solid var(--parchment-dark);
+    padding: 2.5rem 2rem; margin: 0.5rem; min-height: 500px;
+    position: relative; box-shadow: inset 0 0 40px rgba(42,31,20,0.06);
+  }
+  .scan-page::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 30px;
+    background: linear-gradient(90deg, rgba(42,31,20,0.05), transparent);
+  }
+  .scan-page p { margin-bottom: 1rem; text-indent: 2em; text-align: justify; hyphens: auto; }
+  .scan-page .page-number { text-align: center; margin-top: 2rem; font-style: italic; color: var(--ink-light); font-size: 0.9rem; }
+
+  .translation-panel { display: none; }
+  .translation-panel.visible { display: flex; flex-direction: column; }
+  .translation-content {
+    flex: 1; padding: 2rem; overflow-y: auto; font-size: 1.05rem; line-height: 1.8;
+  }
+  .translation-content p { margin-bottom: 1rem; text-indent: 2em; text-align: justify; }
+
+  .lang-selector {
+    font-family: 'Cormorant Garamond', serif; font-size: 0.85rem;
+    padding: 0.3rem 0.6rem;
+    background: rgba(201,168,76,0.1); border: 1px solid var(--gold-dim);
+    color: var(--gold); cursor: pointer; border-radius: 3px;
+  }
+  .lang-selector option { background: var(--leather); color: var(--parchment); }
+
+  .page-nav {
+    display: flex; align-items: center; justify-content: center;
+    gap: 1.5rem; margin-top: 1.5rem; padding: 1rem;
+  }
+  .page-nav button {
+    font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    background: var(--leather); color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    cursor: pointer; border-radius: 3px; transition: all 0.3s;
+  }
+  .page-nav button:hover:not(:disabled) { background: var(--leather-light); }
+  .page-nav button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .page-indicator {
+    font-family: 'Cormorant Garamond', serif; font-size: 1rem;
+    color: var(--leather); font-style: italic;
+  }
+
+  /* ─── AUDIO ─── */
+  .audio-bar {
+    display: none; align-items: center; gap: 1rem;
+    padding: 0.8rem 1.5rem;
+    background: var(--ink); border-top: 2px solid var(--gold);
+    border-radius: 0 0 4px 4px;
+  }
+  .audio-bar.visible { display: flex; }
+  .play-btn {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--gold); color: var(--leather);
+    border: none; border-radius: 50%; cursor: pointer;
+    font-size: 1rem; transition: all 0.3s;
+  }
+  .play-btn:hover { background: var(--gold-light); transform: scale(1.05); }
+  .audio-progress { flex: 1; height: 4px; background: var(--leather-light); border-radius: 2px; overflow: hidden; cursor: pointer; }
+  .audio-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); border-radius: 2px; transition: width 0.3s; }
+  .audio-time { font-family: 'Cormorant Garamond', serif; font-size: 0.85rem; color: var(--gold-dim); }
+  .audio-status { font-family: 'Cormorant Garamond', serif; font-size: 0.85rem; color: var(--parchment-dark); font-style: italic; }
+  .speed-control { display: flex; align-items: center; gap: 0.3rem; }
+  .speed-btn {
+    font-family: 'Cormorant Garamond', serif; font-size: 0.75rem;
+    padding: 0.15rem 0.4rem;
+    background: transparent; border: 1px solid var(--gold-dim);
+    color: var(--gold-dim); cursor: pointer; border-radius: 2px;
+  }
+  .speed-btn.active { background: var(--gold); color: var(--leather); }
+
+  footer {
+    text-align: center; padding: 2rem;
+    background: var(--ink); color: var(--parchment-dark);
+    font-family: 'Cormorant Garamond', serif; font-size: 0.9rem;
+    border-top: 3px solid var(--gold); margin-top: 2rem;
+  }
+  footer .footer-ornament { color: var(--gold-dim); margin-bottom: 0.5rem; font-size: 1rem; letter-spacing: 0.5rem; }
+
+  @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  @media (max-width: 768px) {
+    header h1 { font-size: 1.8rem; }
+    .bookshelf { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+    .book-cover { height: 220px; }
+    .page-area { flex-direction: column; }
+    .reader-header { flex-direction: column; gap: 0.8rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-ornament">❧ ✿ ❧</div>
+  <h1>BIBLIOTHÈQUE ANCIENNE</h1>
+  <p>Collection de Livres Français Anciens — Eski Fransızca Eserler Koleksiyonu</p>
+</header>
+
+<nav class="nav-bar">
+  <button class="nav-btn active" onclick="showLibrary()">☰ Kütüphane</button>
+</nav>
+
+<!-- ═══ LIBRARY VIEW ═══ -->
+<main class="library-container" id="libraryView">
+  <div class="section-title"><span>Eserleri Keşfedin</span></div>
+  <div id="libraryStatus">
+    <div class="loading-msg"><span class="spinner"></span> Kütüphane yükleniyor...</div>
+  </div>
+  <div class="bookshelf" id="bookshelf"></div>
+</main>
+
+<!-- ═══ READER VIEW ═══ -->
+<div class="reader-container" id="readerView">
+  <div class="reader-header">
+    <button class="back-btn" onclick="showLibrary()">◂ Kütüphaneye Dön</button>
+    <span class="reader-book-title" id="readerTitle"></span>
+    <div class="reader-controls">
+      <button class="icon-btn" id="toggleTranslation" onclick="toggleTranslation()" title="Çeviriyi Göster/Gizle">🌐</button>
+      <button class="icon-btn" id="toggleAudio" onclick="toggleAudio()" title="Seslendirme">🔊</button>
+    </div>
+  </div>
+
+  <div class="page-area">
+    <div class="page-panel" id="originalPanel">
+      <div class="panel-header">
+        <span>📜 Orijinal Metin (Fransızca)</span>
+        <div class="panel-actions">
+          <button class="icon-btn" onclick="adjustFontSize(-1)" title="Küçült">A-</button>
+          <button class="icon-btn" onclick="adjustFontSize(1)" title="Büyüt">A+</button>
+        </div>
+      </div>
+      <div class="page-content original-text" id="originalContent">
+        <div class="scan-page" id="scanPage"></div>
+      </div>
+      <div class="audio-bar" id="audioBar">
+        <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+        <div class="audio-progress" onclick="seekAudio(event)">
+          <div class="audio-progress-fill" id="progressFill"></div>
+        </div>
+        <span class="audio-time" id="audioTime">0:00</span>
+        <div class="speed-control">
+          <button class="speed-btn" onclick="setSpeed(0.5)">0.5×</button>
+          <button class="speed-btn active" onclick="setSpeed(1)">1×</button>
+          <button class="speed-btn" onclick="setSpeed(1.5)">1.5×</button>
+        </div>
+        <span class="audio-status" id="audioStatus">Hazır</span>
+      </div>
+    </div>
+
+    <div class="page-panel translation-panel" id="translationPanel">
+      <div class="panel-header">
+        <span>🌐 Çeviri</span>
+        <div class="panel-actions">
+          <select class="lang-selector" id="langSelector" onchange="changeLanguage()">
+            <option value="tr">Türkçe</option>
+            <option value="en">English</option>
+            <option value="de">Deutsch</option>
+            <option value="ar">العربية</option>
+          </select>
+        </div>
+      </div>
+      <div class="translation-content" id="translationContent"></div>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button id="prevBtn" onclick="changePage(-1)">◂ Önceki Sayfa</button>
+    <span class="page-indicator" id="pageIndicator">Sayfa 1 / 5</span>
+    <button id="nextBtn" onclick="changePage(1)">Sonraki Sayfa ▸</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-ornament">❧ ✿ ❧</div>
+  <p>Bibliothèque Ancienne — Eski Fransızca Eserler Dijital Kütüphanesi</p>
+  <p style="margin-top:0.3rem;opacity:0.6;font-size:0.8rem;">Seslendirme: Web Speech API · Tamamen ücretsiz</p>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════
+// KİTAPLAR — data/books.json dosyasından yüklenir
+// ═══════════════════════════════════════════
+let books = [];
+let currentBook = null;
+let currentPage = 0;
+let showTranslationFlag = false;
+let showAudioBarFlag = false;
+let isPlaying = false;
+let currentLang = 'tr';
+let fontSize = 1.05;
+let speechUtterance = null;
+
+// ═══════════════════════════════════════════
+// VERİ YÜKLEME — books.json dosyasını oku
+// ═══════════════════════════════════════════
+async function loadBooks() {
+  const status = document.getElementById('libraryStatus');
+  try {
+    const response = await fetch('data/books.json');
+    if (!response.ok) throw new Error('books.json bulunamadı');
+    const data = await response.json();
+    books = Array.isArray(data) ? data : [];
+    status.style.display = 'none';
+    renderLibrary();
+
+    if (books.length === 0) {
+      status.style.display = 'block';
+      status.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">📜</div>
+          <h2>Henüz kitap eklenmedi</h2>
+          <p>Admin paneli kullanarak kitap ekleyin, JSON dosyasını data/books.json olarak kaydedin.</p>
+        </div>`;
+    }
+  } catch (err) {
+    status.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">⚠️</div>
+        <h2>Kütüphane yüklenemedi</h2>
+        <p>${err.message}<br>data/books.json dosyasının mevcut olduğundan emin olun.</p>
+      </div>`;
+  }
+}
+
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function renderLibrary() {
+  const shelf = document.getElementById('bookshelf');
+  shelf.innerHTML = books.map((book, i) => `
+    <div class="book-card" onclick="openBook(${book.id})" style="animation-delay:${i*0.05}s">
+      <div class="book-cover" style="background:linear-gradient(135deg,${book.coverColor||'#5c3a1e'},${book.coverColor||'#5c3a1e'}dd)">
+        <div class="cover-icon">📜</div>
+        <h3>${book.title}</h3>
+        <div class="author">${book.author||''}</div>
+        <div class="year-badge">${book.year||''}</div>
+      </div>
+      <div class="book-info">
+        <div class="genre">${book.genre||'Genel'}</div>
+        <div class="pages">${book.pageCount||book.pages?.length||'?'} sayfa</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openBook(id) {
+  currentBook = books.find(b => b.id === id);
+  if (!currentBook) return;
+  currentPage = 0;
+  showTranslationFlag = false;
+  showAudioBarFlag = false;
+  stopSpeech();
+
+  document.getElementById('libraryView').style.display = 'none';
+  document.getElementById('readerView').style.display = 'block';
+  document.getElementById('readerTitle').textContent =
+    `${currentBook.title} — ${currentBook.author||''} ${currentBook.year ? '('+currentBook.year+')' : ''}`;
+  document.getElementById('translationPanel').classList.remove('visible');
+  document.getElementById('audioBar').classList.remove('visible');
+  document.getElementById('toggleTranslation').classList.remove('active');
+  document.getElementById('toggleAudio').classList.remove('active');
+
+  // Dil seçeneklerini güncelle (kitapta hangi çeviriler varsa)
+  updateLangOptions();
+  renderPage();
+}
+
+function updateLangOptions() {
+  const selector = document.getElementById('langSelector');
+  const available = Object.keys(currentBook.translations || {});
+  const allLangs = [
+    {code:'tr',name:'Türkçe'}, {code:'en',name:'English'},
+    {code:'de',name:'Deutsch'}, {code:'ar',name:'العربية'}
+  ];
+  selector.innerHTML = allLangs
+    .filter(l => available.includes(l.code))
+    .map(l => `<option value="${l.code}">${l.name}</option>`)
+    .join('');
+  if (available.length === 0) {
+    selector.innerHTML = '<option value="">Çeviri yok</option>';
+  }
+  currentLang = selector.value || 'tr';
+}
+
+function showLibrary() {
+  stopSpeech();
+  document.getElementById('libraryView').style.display = 'block';
+  document.getElementById('readerView').style.display = 'none';
+}
+
+function renderPage() {
+  if (!currentBook || !currentBook.pages) return;
+  const page = currentBook.pages[currentPage];
+  if (!page) return;
+
+  const scanPage = document.getElementById('scanPage');
+  const paragraphs = (page.fr||'').split('\n').map(p => p.trim()).filter(p => p);
+  scanPage.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('') +
+    `<div class="page-number">— ${page.pageNum || currentPage+1} —</div>`;
+
+  if (showTranslationFlag && currentBook.translations && currentBook.translations[currentLang]) {
+    const transText = currentBook.translations[currentLang][currentPage];
+    if (transText) {
+      const tp = transText.split('\n').map(p => p.trim()).filter(p => p);
+      document.getElementById('translationContent').innerHTML = tp.map(p => `<p>${p}</p>`).join('');
+    } else {
+      document.getElementById('translationContent').innerHTML =
+        '<p style="color:#999;font-style:italic;">Bu sayfa için çeviri mevcut değil.</p>';
+    }
+  }
+
+  const totalPages = currentBook.pages.length;
+  document.getElementById('pageIndicator').textContent = `Sayfa ${currentPage+1} / ${totalPages}`;
+  document.getElementById('prevBtn').disabled = currentPage === 0;
+  document.getElementById('nextBtn').disabled = currentPage === totalPages - 1;
+}
+
+function changePage(dir) {
+  stopSpeech();
+  currentPage = Math.max(0, Math.min(currentBook.pages.length-1, currentPage+dir));
+  renderPage();
+}
+
+// ═══════════════════════════════════════════
+// ÇEVİRİ PANELİ
+// ═══════════════════════════════════════════
+function toggleTranslation() {
+  showTranslationFlag = !showTranslationFlag;
+  const panel = document.getElementById('translationPanel');
+  const btn = document.getElementById('toggleTranslation');
+  if (showTranslationFlag) {
+    panel.classList.add('visible');
+    btn.classList.add('active');
+    renderPage();
+  } else {
+    panel.classList.remove('visible');
+    btn.classList.remove('active');
+  }
+}
+
+function changeLanguage() {
+  currentLang = document.getElementById('langSelector').value;
+  if (showTranslationFlag) renderPage();
+}
+
+// ═══════════════════════════════════════════
+// SESLENDİRME — Web Speech API (ücretsiz)
+// ═══════════════════════════════════════════
+function toggleAudio() {
+  showAudioBarFlag = !showAudioBarFlag;
+  const bar = document.getElementById('audioBar');
+  const btn = document.getElementById('toggleAudio');
+  if (showAudioBarFlag) { bar.classList.add('visible'); btn.classList.add('active'); }
+  else { bar.classList.remove('visible'); btn.classList.remove('active'); stopSpeech(); }
+}
+
+function togglePlay() { isPlaying ? stopSpeech() : startSpeech(); }
+
+function startSpeech() {
+  if (!currentBook) return;
+  const text = currentBook.pages[currentPage]?.fr;
+  if (!text) return;
+
+  if ('speechSynthesis' in window) {
+    stopSpeech();
+    speechUtterance = new SpeechSynthesisUtterance(text);
+    speechUtterance.lang = 'fr-FR';
+    speechUtterance.rate = parseFloat(document.querySelector('.speed-btn.active')?.textContent) || 1;
+    const voices = speechSynthesis.getVoices();
+    const frV = voices.find(v => v.lang.startsWith('fr'));
+    if (frV) speechUtterance.voice = frV;
+
+    speechUtterance.onstart = () => {
+      isPlaying = true;
+      document.getElementById('playBtn').textContent = '⏸';
+      document.getElementById('audioStatus').textContent = 'Okunuyor...';
+    };
+    speechUtterance.onend = () => {
+      isPlaying = false;
+      document.getElementById('playBtn').textContent = '▶';
+      document.getElementById('audioStatus').textContent = 'Tamamlandı';
+      document.getElementById('progressFill').style.width = '100%';
+    };
+    speechUtterance.onboundary = (e) => {
+      if (e.charIndex !== undefined) {
+        document.getElementById('progressFill').style.width = ((e.charIndex/text.length)*100)+'%';
+      }
+    };
+    speechSynthesis.speak(speechUtterance);
+  } else {
+    document.getElementById('audioStatus').textContent = 'Bu tarayıcı seslendirme desteklemiyor';
+  }
+}
+
+function stopSpeech() {
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  isPlaying = false;
+  const pb = document.getElementById('playBtn'); if(pb) pb.textContent = '▶';
+  const st = document.getElementById('audioStatus'); if(st) st.textContent = 'Hazır';
+  const pf = document.getElementById('progressFill'); if(pf) pf.style.width = '0%';
+}
+
+function setSpeed(speed) {
+  document.querySelectorAll('.speed-btn').forEach(b => b.classList.toggle('active', b.textContent===speed+'×'));
+  if (isPlaying) { stopSpeech(); startSpeech(); }
+}
+
+function seekAudio() {}
+
+function adjustFontSize(dir) {
+  fontSize = Math.max(0.8, Math.min(1.5, fontSize + dir*0.1));
+  document.getElementById('scanPage').style.fontSize = fontSize+'rem';
+}
+
+// ═══════════════════════════════════════════
+// BAŞLAT
+// ═══════════════════════════════════════════
+if ('speechSynthesis' in window) {
+  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+}
+loadBooks();
+</script>
+</body>
+</html>
